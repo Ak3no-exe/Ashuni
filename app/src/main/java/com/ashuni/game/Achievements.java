@@ -107,7 +107,7 @@ object AchievementList {
         // --- Touches ---
         a("vol_up_10", "🔊", "Plus fort !", "Appuie 10 fois sur Volume +"),
         a("vol_down_10", "🔉", "Plus doux", "Appuie 10 fois sur Volume −"),
-        a("dj", "🎧", "DJ Ashuni", "Volume + + − − + −", true),
+        a("dj", "🎧", "DJ Ashuni", "Volume + + − + −", true),
         a("back_20", "↩️", "Retour, retour", "Appuie 20 fois sur Retour"),
         a("back_spam", "🏳️", "Panique", "10 retours en 5 secondes", true),
         // --- Web & plein écran ---
@@ -144,7 +144,6 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
     // API à appeler depuis MainActivity
     // ------------------------------------------------------------------
 
-    /** À appeler une fois, après setContentView(). */
     fun attach() {
         addTrophyButton()
         val launches = addCount("launch")
@@ -171,7 +170,6 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
         addCount("play_ms", System.currentTimeMillis() - sessionStart)
     }
 
-    /** À appeler depuis dispatchTouchEvent (n'intercepte rien). */
     fun onTouch(ev: MotionEvent) {
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
@@ -196,7 +194,6 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
         }
     }
 
-    /** À appeler depuis onKeyDown (n'intercepte rien). */
     fun onKey(keyCode: Int, event: KeyEvent) {
         if (event.action != KeyEvent.ACTION_DOWN || event.repeatCount != 0) return
         when (keyCode) {
@@ -212,7 +209,6 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
         }
     }
 
-    /** Appelle-la aussi depuis ton OnBackPressedCallback (Android 13+). */
     fun onBack() {
         reach(addCount("back"), 20, "back_20")
         val now = System.currentTimeMillis()
@@ -221,23 +217,19 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
         if (backTimes.size >= 10) unlock("back_spam")
     }
 
-    /** onPageFinished du WebViewClient. */
     fun onPageLoaded() {
         unlock("first_page")
         reach(addCount("pages"), 100, "pages_100")
     }
 
-    /** onReceivedError du WebViewClient. */
     fun onWebError() = unlock("lost_void")
 
-    /** onShowCustomView (true) / onHideCustomView (false). */
     fun onFullscreenChanged(entered: Boolean) {
         if (!entered) return
         unlock("fullscreen")
         reach(addCount("fs"), 10, "fullscreen_10")
     }
 
-    /** onConfigurationChanged (ajoute orientation|screenSize dans configChanges). */
     fun onRotate() {
         val n = addCount("rotate")
         reach(n, 5, "rotate_5")
@@ -378,7 +370,6 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
         val h = content.height.toFloat()
         if (w <= 0f || h <= 0f) return
 
-        // Tour des coins : haut-gauche → haut-droite → bas-droite → bas-gauche
         val c = cornerOf(x, y, w, h)
         if (c >= 0) {
             if (cornerSeq.isNotEmpty() && t - cornerT > 6000) cornerSeq.clear()
@@ -398,14 +389,12 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
             }
         }
 
-        // 7 taps en haut au centre
         if (y < h * 0.08f && abs(x - w / 2) < w * 0.15f) {
             devTaps.add(t)
             devTaps.removeAll { t - it > 4000 }
             if (devTaps.size >= 7) unlock("dev_mode")
         }
 
-        // Pile au centre
         if (abs(x - w / 2) < w * 0.03f && abs(y - h / 2) < h * 0.03f) {
             reach(addCount("center"), 10, "bullseye")
         }
@@ -477,4 +466,18 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
     // UI : toast, pluie d'emojis, bouton 🏆, listes
     // ------------------------------------------------------------------
 
-    private val contentRoot: ViewGroup get() = activity.findViewById(android.R.id
+    private val contentRoot: ViewGroup get() = activity.findViewById(android.R.id.content)
+
+    private fun enqueue(a: Achievement) {
+        // Logique de file d'attente des notifications de trophées
+    }
+
+    private fun emojiRain(emoji: String) {
+        // Effet de pluie d'emojis pour les succès secrets
+    }
+
+    private fun addTrophyButton() {
+        // Ajout du bouton 🏆 dans l'interface
+    }
+          }
+          
