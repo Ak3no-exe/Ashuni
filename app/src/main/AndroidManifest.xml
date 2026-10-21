@@ -6,9 +6,12 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/AppTheme"
         android:hardwareAccelerated="true">
+
+        <!-- Écran de lancement : compte / connexion -->
         <activity
-            android:name=".MainActivity"
+            android:name=".AuthActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
@@ -16,5 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Le jeu (WebView) -->
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
     </application>
 </manifest>
