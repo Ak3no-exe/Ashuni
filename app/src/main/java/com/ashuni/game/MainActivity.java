@@ -20,7 +20,6 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -39,13 +38,6 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-
-        // Pas de compte connecté -> écran de connexion
-        if (Api.token(this).isEmpty()) {
-            startActivity(new Intent(this, AuthActivity.class));
-            finish();
-            return;
-        }
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -98,7 +90,7 @@ public class MainActivity extends Activity {
 
         if (state == null) webView.loadUrl(HOME); else webView.restoreState(state);
 
-        // Succès + vérification de la session
+        // Succès
         final Achievements ach = Achievements.get(this);
         ach.listener = new Achievements.Listener() {
             @Override public void onUnlocked(Achievements.Def d) {
@@ -106,13 +98,6 @@ public class MainActivity extends Activity {
             }
         };
         ach.onLaunch();
-        Api.call(this, "GET", "/api/me", null, new Api.Callback() {
-            @Override public void done(JSONObject json, String error, int status) {
-                if (isFinishing()) return;
-                if (status == 401) { logout(); return; }
-                if (json != null) ach.merge(json.optJSONObject("user"));
-            }
-        });
     }
 
     private View menuButton() {
@@ -130,18 +115,9 @@ public class MainActivity extends Activity {
         lp.setMargins(margin, margin, 0, 0);
         btn.setLayoutParams(lp);
         btn.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { SocialPanel.showMenu(MainActivity.this); }
+            @Override public void onClick(View v) { SocialPanel.showAchievements(MainActivity.this); }
         });
         return btn;
-    }
-
-    public void logout() {
-        Api.call(this, "POST", "/api/logout", new JSONObject(), null);
-        Achievements.get(this).clearAll();
-        Intent i = new Intent(this, AuthActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(i);
-        finish();
     }
 
     /** Fonctions appelables depuis la page : window.AshuniSocial.coin(1) etc. (si Config.GAME_HOOKS) */
