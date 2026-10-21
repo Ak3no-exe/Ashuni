@@ -94,7 +94,7 @@ public class Achievements {
 
     private Achievements(Context c) {
         app = c;
-        sp = Api.prefs(c);
+        sp = c.getSharedPreferences("ashuni_social", Context.MODE_PRIVATE);
         load();
     }
 
@@ -126,7 +126,7 @@ public class Achievements {
                 });
             }
         }
-        if (changed) { save(); sync(0); }
+        if (changed) save();
     }
 
     // ---------- cycle de vie ----------
@@ -160,9 +160,8 @@ public class Achievements {
         check();
         ticks++;
         if (ticks % 10 == 0) save();
-        if (ticks % 60 == 0) sync(0);
     }
-    public synchronized void pause() { save(); sync(0); }
+    public synchronized void pause() { save(); }
 
     // ---------- hooks du jeu (utilisés si Config.GAME_HOOKS = true) ----------
     public synchronized void hookStartRun() {
@@ -189,34 +188,9 @@ public class Achievements {
         inc("runs", 1);
         check();
         save();
-        sync(score);
     }
-
-    // ---------- serveur ----------
-    private void sync(long score) {
-        if (Api.token(app).isEmpty()) return;
-        try {
-            JSONObject b = new JSONObject();
-            b.put("achievements", new JSONObject(unlocked.toString()));
-            b.put("stats", new JSONObject(stats.toString()));
-            b.put("score", score);
-            Api.call(app, "POST", "/api/sync", b, null);
-        } catch (Exception ignored) {}
-    }
-
-    /** Fusionne les données du compte (réponse du serveur) avec les données locales. */
-    public synchronized void merge(JSONObject user) {
-        if (user == null) return;
-        JSONObject a = user.optJSONObject("achievements");
-        JSONObject s = user.optJSONObject("stats");
-        if (a != null) {
-            for (Iterator<String> it = a.keys(); it.hasNext();) {
-                String k = it.next();
-                if (!unlocked.has(k)) put(unlocked, k, a.optLong(k));
-            }
-        }
-        if (s != null) {
-            for (Iterator<String> it = s.keys(); it.hasNext();) {
+}
+ator<String> it = s.keys(); it.hasNext();) {
                 String k = it.next();
                 setMax(k, s.optLong(k));
             }
