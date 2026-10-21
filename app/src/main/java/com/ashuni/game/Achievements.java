@@ -1,4 +1,4 @@
-package com.ashuni.app // ⚠️ remplace par le package de ton MainActivity
+package com.ashuni.game
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -477,4 +477,4 @@ class AchievementManager(private val activity: Activity) : SensorEventListener {
     // UI : toast, pluie d'emojis, bouton 🏆, listes
     // ------------------------------------------------------------------
 
-    private val content get() = 
+    private val contentRoot: ViewGroup get() = activity.findViewById(android.R.id
