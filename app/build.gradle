@@ -1,11 +1,11 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
 }
 
 android {
     namespace 'com.ashuni.game'
-    compileSdk 34 // ou votre version actuelle (ex: 33, 34)
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.ashuni.game"
