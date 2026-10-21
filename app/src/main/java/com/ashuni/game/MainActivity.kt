@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -13,40 +14,54 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialisation du gestionnaire de succès
+        // Création d'une vue de base pour éviter le crash au lancement
+        val rootLayout = FrameLayout(this)
+        setContentView(rootLayout)
+
+        // Initialisation et attachement du gestionnaire de succès
         achievementManager = AchievementManager(this)
-        
-        // Attacher le gestionnaire (bouton 🏆, vérifications de démarrage, etc.)
         achievementManager.attach()
     }
 
     override fun onResume() {
         super.onResume()
-        achievementManager.onResume()
+        if (::achievementManager.isInitialized) {
+            achievementManager.onResume()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        achievementManager.onPause()
+        if (::achievementManager.isInitialized) {
+            achievementManager.onPause()
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        achievementManager.onTouch(ev)
+        if (::achievementManager.isInitialized) {
+            achievementManager.onTouch(ev)
+        }
         return super.dispatchTouchEvent(ev)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        achievementManager.onKey(keyCode, event)
+        if (::achievementManager.isInitialized) {
+            achievementManager.onKey(keyCode, event)
+        }
         return super.onKeyDown(keyCode, event)
     }
 
     override fun onBackPressed() {
-        achievementManager.onBack()
+        if (::achievementManager.isInitialized) {
+            achievementManager.onBack()
+        }
         super.onBackPressed()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        achievementManager.onRotate()
+        if (::achievementManager.isInitialized) {
+            achievementManager.onRotate()
+        }
     }
 }
